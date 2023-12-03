@@ -1,6 +1,6 @@
 package main;
 
-public final class InstrucitonHeaders {
+public final class InstructionHeaders {
 public final static String ADD = "ADD";
 public final static String ADDI = "ADDI";
 public final static String ADDIS = "ADDIS";
