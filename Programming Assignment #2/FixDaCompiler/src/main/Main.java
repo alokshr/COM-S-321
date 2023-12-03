@@ -90,6 +90,7 @@ public class Main {
 		}
 
 		// Make output file
+		String outputFileName = binaryFile.getName();
 
 		// TODO Interpret each 32-bit instruction
 
