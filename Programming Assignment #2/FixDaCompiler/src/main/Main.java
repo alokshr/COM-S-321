@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
-	public static void main(String[] args) {
+	
+	public static void main(String[] args) throws IOException{
+		// Get binary file
 		if (args.length == 0) {
 			throw new IllegalArgumentException("No arguments given");
 		}
@@ -29,7 +31,5 @@ public class Main {
         } catch (IOException e) {
             System.err.println("Error reading the file: " + e.getMessage());
         }
-		
-		
 	}
 }
