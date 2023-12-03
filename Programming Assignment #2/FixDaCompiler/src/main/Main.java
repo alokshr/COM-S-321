@@ -2,8 +2,8 @@ package main;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main {
 	
@@ -16,18 +16,24 @@ public class Main {
 		File binaryFile = new File(args[0]);
 		
 		// Open stream to read the bits of the file
-		FileInputStream reader = null;
+		FileInputStream reader = new FileInputStream(binaryFile);
 		
-		try {
-			reader = new FileInputStream(binaryFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			reader.close();
+		ArrayList<Integer> instructionLines = new ArrayList<Integer>();
+		
+		byte[] buffer = new byte[4];
+
+		while (reader.read(buffer) != -1) {
+			int value = 
+				((buffer[0] & 0xFF) << 24) |
+				((buffer[1] & 0xFF) << 16) |
+				((buffer[2] & 0xFF) << 8)  |
+				((buffer[3] & 0xFF) << 0);
+			
+			instructionLines.add(value);	
 		}
 		
-		byte[] instructionLine = new byte[4];
 		
-		reader.read(instructionLine);
+		
+		reader.close();
 	}
 }
