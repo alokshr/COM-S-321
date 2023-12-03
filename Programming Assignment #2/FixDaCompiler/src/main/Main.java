@@ -79,6 +79,27 @@ public class Main {
 		{ 0b000011, InstructionHeaders.UDIV },
 	}).collect(Collectors.toMap(data -> (Integer) data[0], data -> (String) data[1]));
 	
+	
+	public static Object[] getMnemonic(int instructionBits) {
+		// Get mnemonic of this instruction
+		String mnemonic = null;
+		int opcodeEnd = 0;
+		
+		for (int i = 1; i <= 11; i++) {
+			int opcode = instructionBits >>> (32-i);
+			mnemonic = instructions.get(opcode);
+			
+			if (mnemonic != null) {
+				opcodeEnd = i;
+				break;
+			}
+		}
+		
+		Object[] returnArray = {mnemonic, opcodeEnd};
+		
+		return returnArray;
+	}
+	
 	public static void main(String[] args) throws IOException{
 		// Get binary file
 		if (args.length == 0) {
@@ -86,13 +107,12 @@ public class Main {
 		}
 		
 		File binaryFile = new File(args[0]);
-		
-		// Open stream to read the bits of the file
+
+		// Pull 32-bit lines from the file
 		FileInputStream reader = new FileInputStream(binaryFile);
 		
 		ArrayList<Integer> instructionLines = new ArrayList<Integer>();
 		
-		// Pull 32-bit lines from the file
 		byte[] buffer = new byte[4];
 
 		while (reader.read(buffer) != -1) {
@@ -105,16 +125,27 @@ public class Main {
 			instructionLines.add(value);	
 		}
 		
+		reader.close();
+		
 		// Interpret each 32-bit instruction
 		ArrayList<String> textInstructions = new ArrayList<>();
 		
 		for (int l : instructionLines) {
 			
+			var getMnenmonicReturnArray = getMnemonic(l);
+			
+			String mnemonic = (String) getMnenmonicReturnArray[0];
+			int opcodeEnd = (int) getMnenmonicReturnArray[1];
+			
+			String bits = String.format("%32s", Integer.toBinaryString(l)).replace(' ', '0');
+			
+			bits = bits.substring(0, opcodeEnd) + "*" + bits.substring(opcodeEnd, bits.length());
+			
+			System.out.println(bits + "   " + mnemonic);
 		}
 		
 		// Make output file
 		String outputFileName = binaryFile.getName();
 		
-		reader.close();
 	}
 }
