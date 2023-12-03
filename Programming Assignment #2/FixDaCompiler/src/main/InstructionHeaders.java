@@ -1,6 +1,6 @@
 package main;
 
-public final class InstrucitonHeaders {
+public final class InstructionHeaders {
 public final static String ADD = "ADD";
 public final static String ADDI = "ADDI";
 public final static String ADDIS = "ADDIS";
@@ -17,6 +17,8 @@ public final static String CBZ = "CBZ";
 public final static String DUMP = "DUMP";
 public final static String EOR = "EOR";
 public final static String EORI = "EORI";
+public final static String FS = "FS";
+public final static String FD = "FD";
 public final static String FADDD = "FADDD";
 public final static String FADDS = "FADDS";
 public final static String FCMPD = "FCMPD";
