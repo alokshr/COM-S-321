@@ -1,0 +1,481 @@
+// Team Member:
+// Alok Shrestha (aloks@iastate.edu)
+
+B main
+//Implement procedures here
+
+// [DONE]
+// void swap(int *a, int *b)
+// 
+// X0 = *a, X1 = *b
+// Swaps values at a and b
+// Can only swap values in main memory, not between a register and main memory
+swap:
+    //Dereference ints a and b
+    LDUR X9, [X0, #0] // int tmp = *a; (X9 = tmp)
+    LDUR X10, [X1, #0] // X10 = *b
+
+    // Swap a and b
+    STUR X10, [X0, #0]
+    STUR X9, [X1, #0]
+    BR LR
+
+// [DONE]
+// int find_index(int a[], int n, int start, int value)
+// 
+// X0 = a, X1 = n, X2 = start, X3 = value
+// Returns the index of value in X0
+find_index:
+    ADDI X9, X2, #0     // int index = start; (X9 = index)
+    ADDI X10, X2, #1    // int i = start + 1; (X10 = i)
+
+    // for (i = start + 1; i < n; i++)
+    find_index_start_loop:
+    SUBS XZR, X10, X1
+    B.GE find_index_end
+
+    // X11 = a[i]
+    LSL X11, X10, #3
+    ADD X11, X0, X11
+    LDUR X11, [X11, #0]
+
+    // if (a[i] < value) then index++;
+    SUBS XZR, X11, X3
+    B.GE find_index_end_loop
+    ADDI X9, X9, #1
+
+    // Return to top of for loop
+    find_index_end_loop:
+    ADDI X10, X10, #1
+    B find_index_start_loop 
+
+    find_index_end:
+    // return index;
+    ADDI X0, X9, #0
+    BR LR
+
+// [DONE]
+// int skip_duplicates(int a[], int start, int value)
+// 
+// X0 = a, X1 = start, X2 = value
+// Returns the first index that isn't a duplicate in X0
+skip_duplicates:        
+    ADDI X9, X1, #0         // index = start; (X9 = index)
+
+    // for (index = start; value == a[index]; index++);
+    skip_duplicates_start_loop:
+
+    // X10 = a[index]
+    LSL X10, X9, #3 
+    ADD X10, X0, X10
+    LDUR X10, [X10, #0]
+
+    SUB X10, X2, X10
+    CBNZ X10, skip_duplicates_end_loop
+
+    // Return to top of for loop
+    ADDI X9, X9, #1
+    B skip_duplicates_start_loop
+
+    skip_duplicates_end_loop:
+    // return index;
+    ADDI X0, X9, #0
+    BR LR 
+
+// [DONE]
+// void complete_cycle(int a[], int n, int start, int index, int value)
+// 
+// X0 = a, X1 = n, X2 = start, X3 = index, X4 = value
+// Mutates a's contents
+complete_cycle:
+    SUBI SP, SP, #8
+    STUR LR, [SP, #0]
+             
+    // while (index != start)
+    complete_cycle_start_loop:
+    SUB X9, X3, X2
+    CBZ X9, complete_cycle_end 
+
+    // Prepare find_index() call
+    SUBI SP, SP, #24
+    STUR X0, [SP, #0]
+    STUR X1, [SP, #8]
+    STUR X2, [SP, #16]
+
+    ADDI X3, X4, #0
+
+    // index = find_index(a[], n, start, value);
+    BL find_index
+    ADDI X3, X0, #0
+
+    // Restore registers
+    LDUR X2, [SP, #16]
+    LDUR X1, [SP, #8]
+    LDUR X0, [SP, #0]
+    ADDI SP, SP, #24
+
+    // Prepare skip_duplicates() call
+    SUBI SP, SP, #24
+    STUR X0, [SP, #0]
+    STUR X1, [SP, #8]
+    STUR X2, [SP, #16]
+
+    ADDI X1, X3, #0
+    ADDI X2, X4, #0
+
+    // index = skip_duplicates(a, index, value);
+    BL skip_duplicates
+    ADDI X3, X0, #0
+
+    // Restore registers
+    LDUR X2, [SP, #16]
+    LDUR X1, [SP, #8]
+    LDUR X0, [SP, #0]
+    ADDI SP, SP, #24
+
+    // Prepare swap
+    // X9 = &a[index]
+    LSL X9, X3, #3
+    ADD X9, X0, X9
+
+    // X10 = a[index]
+    LDUR X10, [X9, #0]
+
+    // X11 = value
+    ADDI X11, X3, #0
+
+    // swap(&value, &a[index]);
+    STUR X11, [X9, #0]
+    ADDI X3, X10, #0 
+
+    complete_cycle_end:
+    LDUR LR, [SP, #0]
+    ADDI SP, SP, #8
+    BR LR
+
+
+// [DONE]
+// cycle_sort(int a[], int n)
+// 
+// X0 = a, X1 = n
+// Sorts a
+cycle_sort:
+    // Free up saved registers for use
+    SUBI SP, SP, #32
+    STUR X19, [SP, #0]
+    STUR X20, [SP, #8]
+    STUR X21, [SP, #16]
+    STUR LR, [SP, #24]
+
+    ADDI X19, XZR, #0   // cstart = 0; (X19 = cstart)
+
+    // for (cstart = 0; cstart < n - 1; cstart++)
+    cycle_sort_start_loop:
+    SUBI X9, X1, #1     // X9 = n - 1
+    SUB X9, X19, X9
+    CBZ X9, cycle_sort_end_loop
+
+    // val = a[cstart]; (X20 = val)
+    LSL X20, X19, #3
+    ADD X20, X0, X20
+    LDUR X20, [X20, #0]
+
+    // Prepare find_index() call
+    SUBI SP, SP, #32
+    STUR X0, [SP, #0]
+    STUR X1, [SP, #8]
+    STUR X2, [SP, #16]
+    STUR X3, [SP, #24]
+
+    ADDI X2, X19, #0
+    ADDI X3, X20, #0
+
+    // idx = find_index(a, n, cstart, val); (X21 = idx)
+    BL find_index
+    ADDI X21, X0, #0
+
+    // Restoring registers
+    LDUR X3, [SP, #24]
+    LDUR X2, [SP, #16]
+    LDUR X1, [SP, #8]
+    LDUR X0, [SP, #0]
+    ADDI SP, SP, #32
+
+    // if (idx == cstart) continue
+    SUB X9, X21, X19
+    CBZ X9, cycle_sort_reloop
+
+    // Prepare skip_duplicates() call
+    SUBI SP, SP, #24
+    STUR X0, [SP, #0]
+    STUR X1, [SP, #8]
+    STUR X2, [SP, #16]
+
+    ADDI X1, X21, #0
+    ADDI X2, X20, #0 
+
+    // idx = skip_duplicates(a, idx, val);
+    BL skip_duplicates
+    ADDI X21, X0, #0
+
+    // Restoring registers
+    LDUR X2, [SP, #16]
+    LDUR X1, [SP, #8]
+    LDUR X0, [SP, #0]    
+    ADDI SP, SP, #24
+
+    // Prepare swap
+    // X9 = &a[idx]
+    LSL X9, X21, #3
+    ADD X9, X0, X9
+
+    // X10 = a[idx]
+    LDUR X10, [X9, #0]
+
+    // X11 = val
+    ADDI X11, X20, #0
+
+    // swap(&val, &a[idx]);
+    STUR X11, [X9, #0]
+    ADDI X20, X10, #0 
+
+    // Prepare complete_cycle() call
+    SUBI SP, SP, #40
+    STUR X0, [SP, #0]
+    STUR X1, [SP, #8]
+    STUR X2, [SP, #16]
+    STUR X3, [SP, #24]
+    STUR X4, [SP, #32]
+
+    ADDI X2, X19, #0
+    ADDI X3, X21, #0
+    ADDI X4, X20, #0
+
+    // complete_cycle(a, n, cstart, idx, val);
+    BL complete_cycle
+
+    // Restoring registers
+    LDUR X4, [SP, #32]
+    LDUR X3, [SP, #24]
+    LDUR X2, [SP, #16]
+    LDUR X1, [SP, #8]
+    LDUR X0, [SP, #0]
+    ADDI SP, SP, #40
+
+    cycle_sort_reloop:
+    ADDI X19, X19, #1
+    B cycle_sort_start_loop
+
+    cycle_sort_end_loop:
+    // Restore saved registers
+    LDUR LR, [SP, #24]
+    LDUR X21, [SP, #16]
+    LDUR X20, [SP, #8]
+    LDUR X19, [SP, #0]
+    ADDI SP, SP, #32
+    BR LR
+
+// [DONE]
+// fill(int a[], int n)
+//
+// X0 = a, X1 = n
+// Fills a given array with integers in reverse order
+fill:                   
+    ADDI X9, XZR, #0        // int i = 0; (X9 = i)
+
+    fill_start_loop:
+
+    //for (i = 0; i < n; i++)
+    SUB X10, X9, X1
+    CBZ X10, fill_end           
+    
+    // X10 = &a[i];
+    LSL X10, X9, #3
+    ADD X10, X0, X10
+
+    // X11 = n - i - 1
+    SUB X11, X1, X9
+    SUBI X11, X11, #1
+
+    // a[i] = n - i - 1;
+    STUR X11, [X10, #0]
+
+    // Return to top of for loop
+    ADDI X9, X9, #1
+    B fill_start_loop
+    
+    fill_end:
+    BR LR
+
+
+// [DONE]
+// int binary_search(int *a, int start, int end, int value)
+// 
+// X0 = *a, X1 = start, X2 = end, X3 = value
+// Returns the index of the value in the array in X0, if not found, returns -1
+binary_search:
+    SUBI SP, SP, #8
+    STUR LR, [SP, #0]
+
+    // if (end < start) return -1
+    SUBS XZR, X2, X1
+    B.GE binary_search_start_loop
+    SUBI X0, XZR, #1 
+
+    LDUR LR, [SP, #0]
+    ADDI SP, SP, #8
+    BR LR
+
+    binary_search_start_loop:
+    // index = (start + end) / 2; (X9 = index)
+    ADD X9, X1, X2
+    LSR X9, X9, #1  
+
+    // X10 = a[index]
+    LSL X10, X9, #3
+    ADD X10, X0, X10
+    LDUR X10, [X10, #0] 
+
+    //if (a[index] == value) return index;
+    SUBS X11, X10, X3
+    CBNZ X11, binary_search_left_half_search
+    
+    ADDI X0, X9, #0
+
+    LDUR LR, [SP, #0]
+    ADDI SP, SP, #8
+    BR LR
+
+    //if (a[index] > value) return binary_search(a, start, index - 1, value);
+    binary_search_left_half_search:
+    B.LE binary_search_right_half_search
+    
+    // Prepare for binary_search() call
+    SUBI SP, SP, #24
+    STUR X1, [SP, #0]
+    STUR X2, [SP, #8]
+    STUR X3, [SP, #16]
+
+    SUBI X2, X9, #1
+
+    // return binary_search(a, start, index - 1, value);
+    BL binary_search
+    LDUR X3, [SP, #16]
+    LDUR X2, [SP, #8]
+    LDUR X1, [SP, #0]
+    ADDI SP, SP, #24
+
+    LDUR LR, [SP, #0]
+    ADDI SP, SP, #8
+    BR LR
+    
+    binary_search_right_half_search:
+    // Prepare for binary_search() call
+    SUBI SP, SP, #24
+    STUR X1, [SP, #0]
+    STUR X2, [SP, #8]
+    STUR X3, [SP, #16]
+
+    ADDI X1, X9, #1
+
+    // return binary_search(a, index + 1, end, value);
+    BL binary_search
+    LDUR X3, [SP, #16]
+    LDUR X2, [SP, #8]
+    LDUR X1, [SP, #0]
+    ADDI SP, SP, #24
+
+    LDUR LR, [SP, #0]
+    ADDI SP, SP, #8
+    BR LR
+
+
+// // [DEBUG PURPOSE ONLY]
+// // void print_array(int a[], int size)
+// // 
+// // X0 = a, X1 = size
+// // Prints the contents of a given array
+// print_array:
+//     // loop through array and print vals
+//     ADDI X9, XZR, #0        // i = 0; (X9 = i)
+
+//     print_array_start_loop:
+//     // for (i = 0; i < n; i++)
+//     SUB X10, X9, X1
+//     CBZ X10, print_array_end_loop
+
+//     // X10 = a[i]
+//     LSL X10, X9, #3
+//     ADD X10, X0, X10
+//     LDUR X10, [X10, #0]
+
+//     PRNT X10
+
+//     // Return to top of for loop
+//     ADDI X9, X9, #1
+//     B print_array_start_loop
+
+//     print_array_end_loop:
+//     PRNL
+//     BR LR
+    
+// [DONE]
+// int main()
+//
+// X19 = start of array
+// X20 = N, size of array
+// Where the magic gets put together
+main:
+    // Since the emulator zeros out everything, I wrote main with that in mind
+    ADDI X19, XZR, #0       // X19 = a
+    ADDI X20, XZR, #10      // X20 = 10 (X20 = N)
+
+    //fill(a, N);
+    ADDI X0, X19, #0
+    ADDI X1, X20, #0
+    BL fill
+
+    // cycle_sort(a, N);
+    ADDI X0, X19, #0
+    ADDI X1, X20, #0    
+    BL cycle_sort
+
+    // //print_array(a, N)
+    // ADDI X0, X19, #0
+    // ADDI X1, X20, #0
+    // BL print_array      // Should be sorted 
+  
+    // binary_search(a, 0, N - 1, 0);
+    ADDI X0, X19, #0
+    ADDI X1, XZR, #0
+    SUBI X2, X20, #1
+    ADDI X3, XZR, #0
+    BL binary_search
+    // PRNT X0             // Should be 0
+
+    // binary_search(a, 0, N - 1, N - 1);
+    ADDI X0, X19, #0
+    ADDI X1, XZR, #0
+    SUBI X2, X20, #1
+    SUBI X3, X20, #1
+    BL binary_search 
+    // PRNT X0             // Should be 9
+    
+    // binary_search(a, 0, N - 1, N / 2);
+    ADDI X0, X19, #0
+    ADDI X1, XZR, #0
+    SUBI X2, X20, #1
+    LSR X3, X20, #1
+    BL binary_search 
+    // PRNT X0             // Should be 5
+
+    // binary_search(a, 0, N - 1, N);
+    ADDI X0, X19, #0
+    ADDI X1, XZR, #0
+    SUBI X2, X20, #1
+    ADDI X3, X20, #0
+    BL binary_search 
+    // PRNT X0             // Should be -1
+
+    // Branch and link (BL) requires this print statement or else we go outside the program
+    PRNL
