@@ -1,4 +1,4 @@
-package main;
+package instructions;
 
 public final class InstructionHeaders {
 	public final static String ADD = "ADD";

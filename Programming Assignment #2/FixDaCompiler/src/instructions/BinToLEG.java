@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import main.InstructionHeaders;
-
 public class BinToLEG {
 	public static final Map<Integer, String> instructions = Stream.of(new Object[][]{
 		  { 0b10001011000, InstructionHeaders.ADD },
@@ -340,6 +338,10 @@ public class BinToLEG {
 	
 	private static String decodeIWType(String mnemonic, int argumentBits) {
 		return "";
+	}
+	
+	private static int convertToBranchAddress(int i) {
+		return 
 	}
 	
 }

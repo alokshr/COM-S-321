@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -43,17 +44,25 @@ public class Main {
 			String binary = String.format("%32s", Integer.toBinaryString(l)).replace(' ', '0');
 			String text = BinToLEG.getLEGv8Code(l);
 			
-			System.out.printf("%s    %s\n", binary, text);
+//			System.out.printf("%s    %s\n", binary, text);
 			
 			textInstructions.add(text);
 		}
 		
-		for (String s : textInstructions) {
-//			System.out.println(s);
-		}
 		
 		// Make output file
-		String outputFileName = binaryFile.getName();
+		String outputFileName = binaryFile.getName().replaceAll("[.].*", "") + ".legv8asm";
 		
+		File outputFile = new File(outputFileName);
+		outputFile.setWritable(true);
+		
+		FileWriter fw = new FileWriter(outputFile);
+		
+		for (String s : textInstructions) {
+			fw.write(s + "\n");
+		}
+		
+		fw.flush();
+		fw.close();
 	}
 }
