@@ -104,7 +104,6 @@ public class BinToLEG {
 		}
 	}
 	
-	//TODO
 	private static InstructionType getType(String mnemonic) {
 		switch (mnemonic) {
 			case InstructionHeaders.ADD:
@@ -217,7 +216,7 @@ public class BinToLEG {
 		String mnemonic = null;
 		int opcodeEnd = 0;
 		
-		for (int i = 0; i <= 11; i++) {
+		for (int i = 6; i <= 11; i++) {
 			int opcode = instructionBits >>> (32-i);
 			
 			mnemonic = instructions.get(opcode);
@@ -239,14 +238,21 @@ public class BinToLEG {
 			int shamt = (argumentBits >>> 10) & 0x2F;
 			return String.format("%s X%d, #%d", mnemonic, rd, shamt);
 		}
-		
-		//TODO fix BR
-		if (mnemonic.equals("BR")) {
-			return String.format("%s %s", mnemonic, getRegisterName(rd));
-		}
 
 		int rn = (argumentBits >>> 5) & 0x1F;
 		int rm = (argumentBits >>> 16) & 0x1F;
+		
+		if (mnemonic.equals("BR")) {
+			return String.format("%s %s", mnemonic, getRegisterName(rn));
+		}
+		
+		if (mnemonic.equals("PRNL")) {
+			return mnemonic;
+		}
+		
+		if (mnemonic.equals("PRNT")) {
+			return String.format("%s %s", mnemonic, getRegisterName(rd));
+		}
 		
 		return String.format("%s %s, %s, %s", mnemonic, getRegisterName(rd), getRegisterName(rn), getRegisterName(rm));
 	}
@@ -270,13 +276,66 @@ public class BinToLEG {
 	}
 	
 	private static String decodeBType(String mnemonic, int argumentBits) {
-		int br_addr = argumentBits & 0x3FFFFF;
+		int br_addr = argumentBits & 0x03FFFFFF;
 		
 		return String.format("%s %d", mnemonic, br_addr);
 	}
 	
 	private static String decodeCBType(String mnemonic, int argumentBits) {
-		return "";
+		int rt = argumentBits & 0x1F;
+		int br_addr = (argumentBits >>> 5) & 0x7FFFF;
+		
+		if (mnemonic.equals(InstructionHeaders.BCOND)) {
+			String conditional = null;
+			
+			switch (rt) {
+			case 0:
+				conditional = "EQ";
+				break;
+			case 1:
+				conditional = "NE";
+				break;
+			case 2:
+				conditional = "HS";
+				break;
+			case 3:
+				conditional = "LO";
+				break;
+			case 4:
+				conditional = "MI";
+				break;
+			case 5:
+				conditional = "PL";
+				break;
+			case 6:
+				conditional = "VS";
+				break;
+			case 7:
+				conditional = "VC";
+				break;
+			case 8:
+				conditional = "HI";
+				break;
+			case 9:
+				conditional = "LS";
+				break;
+			case 10:
+				conditional = "GE";
+				break;
+			case 11:
+				conditional = "LT";
+				break;
+			case 12:
+				conditional = "GT";
+				break;
+			case 13:
+				conditional = "LE";
+				break;
+			}
+			return String.format("%s %s", mnemonic + conditional, br_addr);
+		}
+		
+		return String.format("%s %s, %d", mnemonic, getRegisterName(rt), br_addr);
 	}
 	
 	private static String decodeIWType(String mnemonic, int argumentBits) {

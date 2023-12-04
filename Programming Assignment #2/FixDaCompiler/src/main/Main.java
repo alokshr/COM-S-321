@@ -40,11 +40,16 @@ public class Main {
 		ArrayList<String> textInstructions = new ArrayList<>();
 		
 		for (int l : instructionLines) {
-			textInstructions.add(BinToLEG.getLEGv8Code(l));
+			String binary = String.format("%32s", Integer.toBinaryString(l)).replace(' ', '0');
+			String text = BinToLEG.getLEGv8Code(l);
+			
+			System.out.printf("%s    %s\n", binary, text);
+			
+			textInstructions.add(text);
 		}
 		
 		for (String s : textInstructions) {
-			System.out.println(s);
+//			System.out.println(s);
 		}
 		
 		// Make output file
