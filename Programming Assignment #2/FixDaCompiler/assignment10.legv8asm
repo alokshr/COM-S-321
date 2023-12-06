@@ -1,0 +1,243 @@
+B label193
+LDUR X9, [X0, #0]
+LDUR X10, [X1, #0]
+STUR X10, [X0, #0]
+STUR X9, [X1, #0]
+BR LR
+label6:
+ADDI X9, X2, #0
+ADDI X10, X2, #1
+label8:
+SUBS XZR, X10, X1
+B.GE label18
+LSL X11, #3
+ADD X11, X0, X11
+LDUR X11, [X11, #0]
+SUBS XZR, X11, X3
+B.GE label16
+ADDI X9, X9, #1
+label16:
+ADDI X10, X10, #1
+B label8
+label18:
+ADDI X0, X9, #0
+BR LR
+label20:
+ADDI X9, X1, #0
+label21:
+LSL X10, #3
+ADD X10, X0, X10
+LDUR X10, [X10, #0]
+SUB X10, X2, X10
+CBNZ X10, label28
+ADDI X9, X9, #1
+B label21
+label28:
+ADDI X0, X9, #0
+BR LR
+label30:
+SUBI SP, SP, #8
+STUR LR, [SP, #0]
+SUB X9, X3, X2
+CBZ X9, label63
+SUBI SP, SP, #24
+STUR X0, [SP, #0]
+STUR X1, [SP, #8]
+STUR X2, [SP, #16]
+ADDI X3, X4, #0
+BL label6
+ADDI X3, X0, #0
+LDUR X2, [SP, #16]
+LDUR X1, [SP, #8]
+LDUR X0, [SP, #0]
+ADDI SP, SP, #24
+SUBI SP, SP, #24
+STUR X0, [SP, #0]
+STUR X1, [SP, #8]
+STUR X2, [SP, #16]
+ADDI X1, X3, #0
+ADDI X2, X4, #0
+BL label20
+ADDI X3, X0, #0
+LDUR X2, [SP, #16]
+LDUR X1, [SP, #8]
+LDUR X0, [SP, #0]
+ADDI SP, SP, #24
+LSL X9, #3
+ADD X9, X0, X9
+LDUR X10, [X9, #0]
+ADDI X11, X3, #0
+STUR X11, [X9, #0]
+ADDI X3, X10, #0
+label63:
+LDUR LR, [SP, #0]
+ADDI SP, SP, #8
+BR LR
+label66:
+SUBI SP, SP, #32
+STUR X19, [SP, #0]
+STUR X20, [SP, #8]
+STUR X21, [SP, #16]
+STUR LR, [SP, #24]
+ADDI X19, XZR, #0
+label72:
+SUBI X9, X1, #1
+SUB X9, X19, X9
+CBZ X9, label130
+LSL X20, #3
+ADD X20, X0, X20
+LDUR X20, [X20, #0]
+SUBI SP, SP, #32
+STUR X0, [SP, #0]
+STUR X1, [SP, #8]
+STUR X2, [SP, #16]
+STUR X3, [SP, #24]
+ADDI X2, X19, #0
+ADDI X3, X20, #0
+BL label6
+ADDI X21, X0, #0
+LDUR X3, [SP, #24]
+LDUR X2, [SP, #16]
+LDUR X1, [SP, #8]
+LDUR X0, [SP, #0]
+ADDI SP, SP, #32
+SUB X9, X21, X19
+CBZ X9, label128
+SUBI SP, SP, #24
+STUR X0, [SP, #0]
+STUR X1, [SP, #8]
+STUR X2, [SP, #16]
+ADDI X1, X21, #0
+ADDI X2, X20, #0
+BL label20
+ADDI X21, X0, #0
+LDUR X2, [SP, #16]
+LDUR X1, [SP, #8]
+LDUR X0, [SP, #0]
+ADDI SP, SP, #24
+LSL X9, #3
+ADD X9, X0, X9
+LDUR X10, [X9, #0]
+ADDI X11, X20, #0
+STUR X11, [X9, #0]
+ADDI X20, X10, #0
+SUBI SP, SP, #40
+STUR X0, [SP, #0]
+STUR X1, [SP, #8]
+STUR X2, [SP, #16]
+STUR X3, [SP, #24]
+STUR X4, [SP, #32]
+ADDI X2, X19, #0
+ADDI X3, X21, #0
+ADDI X4, X20, #0
+BL label30
+LDUR X4, [SP, #32]
+LDUR X3, [SP, #24]
+LDUR X2, [SP, #16]
+LDUR X1, [SP, #8]
+LDUR X0, [SP, #0]
+ADDI SP, SP, #40
+label128:
+ADDI X19, X19, #1
+B label72
+label130:
+LDUR LR, [SP, #24]
+LDUR X21, [SP, #16]
+LDUR X20, [SP, #8]
+LDUR X19, [SP, #0]
+ADDI SP, SP, #32
+BR LR
+label136:
+ADDI X9, XZR, #0
+label137:
+SUB X10, X9, X1
+CBZ X10, label146
+LSL X10, #3
+ADD X10, X0, X10
+SUB X11, X1, X9
+SUBI X11, X11, #1
+STUR X11, [X10, #0]
+ADDI X9, X9, #1
+B label137
+label146:
+BR LR
+label147:
+SUBI SP, SP, #8
+STUR LR, [SP, #0]
+SUBS XZR, X2, X1
+B.GE label155
+SUBI X0, XZR, #1
+LDUR LR, [SP, #0]
+ADDI SP, SP, #8
+BR LR
+label155:
+ADD X9, X1, X2
+LSR X9, #1
+LSL X10, #3
+ADD X10, X0, X10
+LDUR X10, [X10, #0]
+SUBS X11, X10, X3
+CBNZ X11, label166
+ADDI X0, X9, #0
+LDUR LR, [SP, #0]
+ADDI SP, SP, #8
+BR LR
+label166:
+B.LE label180
+SUBI SP, SP, #24
+STUR X1, [SP, #0]
+STUR X2, [SP, #8]
+STUR X3, [SP, #16]
+SUBI X2, X9, #1
+BL label147
+LDUR X3, [SP, #16]
+LDUR X2, [SP, #8]
+LDUR X1, [SP, #0]
+ADDI SP, SP, #24
+LDUR LR, [SP, #0]
+ADDI SP, SP, #8
+BR LR
+label180:
+SUBI SP, SP, #24
+STUR X1, [SP, #0]
+STUR X2, [SP, #8]
+STUR X3, [SP, #16]
+ADDI X1, X9, #1
+BL label147
+LDUR X3, [SP, #16]
+LDUR X2, [SP, #8]
+LDUR X1, [SP, #0]
+ADDI SP, SP, #24
+LDUR LR, [SP, #0]
+ADDI SP, SP, #8
+BR LR
+label193:
+ADDI X19, XZR, #0
+ADDI X20, XZR, #10
+ADDI X0, X19, #0
+ADDI X1, X20, #0
+BL label136
+ADDI X0, X19, #0
+ADDI X1, X20, #0
+BL label66
+ADDI X0, X19, #0
+ADDI X1, XZR, #0
+SUBI X2, X20, #1
+ADDI X3, XZR, #0
+BL label147
+ADDI X0, X19, #0
+ADDI X1, XZR, #0
+SUBI X2, X20, #1
+SUBI X3, X20, #1
+BL label147
+ADDI X0, X19, #0
+ADDI X1, XZR, #0
+SUBI X2, X20, #1
+LSR X3, #1
+BL label147
+ADDI X0, X19, #0
+ADDI X1, XZR, #0
+SUBI X2, X20, #1
+ADDI X3, X20, #0
+BL label147
+PRNL

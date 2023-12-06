@@ -475,7 +475,7 @@ main:
     SUBI X2, X20, #1
     ADDI X3, X20, #0
     BL binary_search 
-    // PRNT X0             // Should be -1
+    PRNT X0             // Should be -1
 
     // Branch and link (BL) requires this print statement or else we go outside the program
     PRNL

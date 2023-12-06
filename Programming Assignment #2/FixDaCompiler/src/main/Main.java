@@ -5,8 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import instructions.BinToLEG;
+import instructions.Instruction;
+import instructions.InstructionType;
 
 public class Main {
 	
@@ -21,7 +28,7 @@ public class Main {
 		// Pull 32-bit lines from the file
 		FileInputStream reader = new FileInputStream(binaryFile);
 		
-		ArrayList<Integer> instructionLines = new ArrayList<Integer>();
+		ArrayList<Integer> bitList = new ArrayList<Integer>();
 		
 		byte[] buffer = new byte[4];
 
@@ -32,22 +39,51 @@ public class Main {
 				((buffer[2] & 0xFF) << 8)  |
 				((buffer[3] & 0xFF) << 0);
 			
-			instructionLines.add(value);	
+			bitList.add(value);	
 		}
 		
 		reader.close();
 		
 		// Interpret each 32-bit instruction
-		ArrayList<String> textInstructions = new ArrayList<>();
+		// HashMap<Integer, Instruction> instructionMap = new HashMap<Integer, Instruction>();
+		// ArrayList<Instruction> outputInstructionsList = new ArrayList<Instruction>(instructionMap.values());
 		
-		for (int l : instructionLines) {
-			String binary = String.format("%32s", Integer.toBinaryString(l)).replace(' ', '0');
-			String text = BinToLEG.getLEGv8Code(l);
+		ArrayList<Instruction> outputInstructionsList = new ArrayList<Instruction>();
+		
+		for (int bits : bitList) {
+			Instruction instruction = BinToLEG.getLEGv8Code(bits);
 			
-//			System.out.printf("%s    %s\n", binary, text);
-			
-			textInstructions.add(text);
+			//instructionMap.put(instruction.instructionNum, instruction)
+			outputInstructionsList.add(instruction);
 		}
+		
+		var readFromInstructionList = new ArrayList<>(outputInstructionsList);
+		HashSet<String> labelList = new HashSet<>();
+		
+		for (Instruction instr : readFromInstructionList) {
+			if (instr.type == InstructionType.B || instr.type == InstructionType.CB) {
+				
+				// Grab label & number
+				String label = instr.debugString.replaceAll("\\b(?!label).+ ", "");
+				int labelNum = Integer.valueOf(label.substring(5));
+				
+				if (!labelList.contains(label)) {
+					labelList.add(label);
+					
+					// Find where number is the same
+					var foundInstruction = outputInstructionsList.stream().filter((inst -> inst.instructionNum == labelNum)).collect(Collectors.toList());
+					int labelInstructionIndex = outputInstructionsList.indexOf(foundInstruction.get(0));
+					
+					// Input new label at found index + 1
+					outputInstructionsList.add(labelInstructionIndex, new Instruction(label + ":", -1, InstructionType.L));
+				}
+			}
+		}
+		
+		for(Instruction debug : outputInstructionsList) {
+			System.out.println(debug.debugString);
+		}
+		
 		
 		
 		// Make output file
@@ -58,8 +94,8 @@ public class Main {
 		
 		FileWriter fw = new FileWriter(outputFile);
 		
-		for (String s : textInstructions) {
-			fw.write(s + "\n");
+		for (Instruction instr : outputInstructionsList) {
+			fw.write(instr.debugString + "\n");
 		}
 		
 		fw.flush();

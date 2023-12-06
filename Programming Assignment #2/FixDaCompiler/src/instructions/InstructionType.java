@@ -6,5 +6,5 @@ public enum InstructionType {
 	D,
 	B,
 	CB,
-	IW
+	L,
 }
