@@ -22,11 +22,11 @@ public class Main {
 		}
 		
 		File binaryFile = new File(args[0]);
-
+		
+		// Check for file extension
 		String correctFileExtension = ".legv8asm.machine";
 		Pattern extensionFinder = Pattern.compile("[.].*");
 		Matcher extensionGetter = extensionFinder.matcher(binaryFile.getName());
-		
 		
 		if (extensionGetter.find()) {
 			if (!extensionGetter.group().equals(correctFileExtension)) {
@@ -83,7 +83,9 @@ public class Main {
 					labelList.add(label);
 					
 					// Find where number is the same
-					var foundInstruction = outputInstructionsList.stream().filter((inst -> inst.instructionNum == labelNum)).collect(Collectors.toList());
+					var foundInstruction = outputInstructionsList.stream()
+								.filter((inst -> inst.instructionNum == labelNum))
+								.collect(Collectors.toList());
 					int labelInstructionIndex = outputInstructionsList.indexOf(foundInstruction.get(0));
 					
 					// Input new label at found index + 1
