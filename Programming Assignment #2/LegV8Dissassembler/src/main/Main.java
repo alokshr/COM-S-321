@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import instructions.BinToLEG;
@@ -21,6 +23,20 @@ public class Main {
 		
 		File binaryFile = new File(args[0]);
 
+		String correctFileExtension = ".legv8asm.machine";
+		Pattern extensionFinder = Pattern.compile("[.].*");
+		Matcher extensionGetter = extensionFinder.matcher(binaryFile.getName());
+		
+		
+		if (extensionGetter.find()) {
+			if (!extensionGetter.group().equals(correctFileExtension)) {
+				throw new IllegalArgumentException("Invalid file extension");
+			}
+		} else {
+			throw new IllegalArgumentException("Invalid file extension");
+		}
+		
+		
 		// Pull 32-bit lines from the file
 		FileInputStream reader = new FileInputStream(binaryFile);
 		
