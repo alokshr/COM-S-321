@@ -2,13 +2,9 @@ package main;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import instructions.BinToLEG;
@@ -84,21 +80,19 @@ public class Main {
 			System.out.println(debug.debugString);
 		}
 		
-		
-		
-		// Make output file
-		String outputFileName = binaryFile.getName().replaceAll("[.].*", "") + ".legv8asm";
-		
-		File outputFile = new File(outputFileName);
-		outputFile.setWritable(true);
-		
-		FileWriter fw = new FileWriter(outputFile);
-		
-		for (Instruction instr : outputInstructionsList) {
-			fw.write(instr.debugString + "\n");
-		}
-		
-		fw.flush();
-		fw.close();
+//		// Make output file
+//		String outputFileName = binaryFile.getName().replaceAll("[.].*", "") + ".legv8asm";
+//		
+//		File outputFile = new File(outputFileName);
+//		outputFile.setWritable(true);
+//		
+//		FileWriter fw = new FileWriter(outputFile);
+//		
+//		for (Instruction instr : outputInstructionsList) {
+//			fw.write(instr.debugString + "\n");
+//		}
+//		
+//		fw.flush();
+//		fw.close();
 	}
 }
