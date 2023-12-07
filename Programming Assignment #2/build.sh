@@ -1,0 +1,1 @@
+javac -d .\\LegV8Dissassembler\\bin\\ .\\LegV8Dissassembler\\src\\main\\Main.java .\\LegV8Dissassembler\\src\\instructions\\*.java

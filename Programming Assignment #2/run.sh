@@ -1,0 +1,1 @@
+java -cp .\\LegV8Dissassembler\\bin\\ .\\LegV8Dissassembler\\src\\main\\Main.java $1
