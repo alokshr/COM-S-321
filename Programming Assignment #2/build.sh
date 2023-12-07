@@ -1,1 +1,1 @@
-javac -d .\\LegV8Dissassembler\\bin\\ .\\LegV8Dissassembler\\src\\main\\Main.java .\\LegV8Dissassembler\\src\\instructions\\*.java
+javac -d ./LegV8Dissassembler/bin/ -sourcepath ./LegV8Dissassembler/src ./LegV8Dissassembler/src/main/Main.java
